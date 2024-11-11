@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import datetime
 
-#colocando os numeros decendiais em suas respectivas datas
+#placing the decimal numbers on their respective dates
 periodos_inicio = {} 
 periodos_inicio[0] = "-"
 periodos_inicio[1] = datetime.strptime("01/01", "%d/%m").date().strftime("%d-%b")
@@ -92,33 +92,33 @@ def removeColumns(data, colunas_list): #removing columns that don't need to be i
     return new_array
 
 
-def find_window_date(data): #salvar a janela de plantio em duas novas colunas (inicio e termino)
+def find_window_date(data): #save the planting window in two new columns (start and end)
     new_data = data
     new_data["Inicio"] = 0
     new_data["Termino"] = 0
-    for j in range(0,new_data.shape[0]): #percorre todas as linhas
+    for j in range(0,new_data.shape[0]): #goes through all the lines
         first = 0
         last = 0
-        janela_excecao = False #caso a janela ultrapasse de um ano para outro (exemplo de outubro ate fevereiro)
-        for i in range(1,37): #percorre todas as colunas de data
-            if(new_data.loc[j, str(i)] != 0 and first == 0): #1. acha a primeira ocorrencia nao nula
-                if((i == 1 and new_data.loc[j, str(36)] != 0) or janela_excecao): #2. caso comece o ano no meio de uma janela
+        janela_excecao = False #if the window extends from one year to the next (e.g. from October to February)
+        for i in range(1,37): #scrolls through all date columns
+            if(new_data.loc[j, str(i)] != 0 and first == 0): #1. finds the first non-null occurrence
+                if((i == 1 and new_data.loc[j, str(36)] != 0) or janela_excecao): #2. if you start the year in the middle of a window
                     if(i == 36):
                         first = i
                         break
                     janela_excecao = True
-                    if(new_data.loc[j, str(i+1)] == 0 and last == 0): #2.1 termino da janela
+                    if(new_data.loc[j, str(i+1)] == 0 and last == 0): #2.1 end of window
                         last = i
                         continue
-                    if(new_data.loc[j, str(i)] != 0 and last != 0): #2.2 inicio da janela
+                    if(new_data.loc[j, str(i)] != 0 and last != 0): #2.2 beginning of the window
                         first = i
                         break
                     continue
-                first = i #1.1 inicio da janela
+                first = i #1.1 beginning of the window
                 continue
-            if(new_data.loc[j, str(i)] != 0): #1.2 termino da janela
+            if(new_data.loc[j, str(i)] != 0): #1.2 end of window
                 last = i
-        if(last == 0): #caso exista apenas um numero
+        if(last == 0): #case only exists one number
             last = first
         new_data.loc[j,"Inicio"] = first
         new_data.loc[j,"Termino"] = last
